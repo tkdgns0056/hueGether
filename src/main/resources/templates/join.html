@@ -1,0 +1,280 @@
+<!--회원가입 페이지-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>회원 가입</title>
+</head>
+
+<style>
+    #mail_check_input_box_false{
+        background-color:#ebebe4;
+    }
+
+    #mail_check_input_box_true{
+        background-color:white;
+    }
+    .correct{
+        color : green;
+    }
+    .incorrect{
+        color : red;
+    }
+</style>
+
+<body>
+
+<form th:action="@{/user/save}" method="post" th:object="${userDto}" onsubmit="return formSubmit();">
+    <h1>회원가입</h1>
+    <div class="form-group">
+        <label for="email">이메일</label>
+        <div class = "input-group">
+            <input type="email" class="form-control" id="email" name="email" th:field="*{email}" placeholder="이메일을 입력하세요.">
+            <span id ="emailText"></span>
+            <input type="hidden" id="loginType" name ="loginType" th:field="*{loginType}">
+        </div>
+        <button class="btn btn-primary" type="button" id="checkEmail">인증번호</button>
+    </div>
+
+    <div class="form-group">
+        <label for ="emailConfirm" >이메일 인증 번호</label>
+        <div class = "input-group">
+            <input type ="text" class="form-control" name = "emailConfirm" id="emailConfirm" placeholder="인증 번호를 입력 해주세요.">
+            <span id="emailConfirmText"></span>
+        </div>
+    </div>
+
+        <div class="form-group">
+            <label for="userName">이름</label>
+            <div class = "input-group">
+                <input type="text" class="form-control" id="userName"  name="userName" th:field="*{userName}"  placeholder="이름을 입력하세요.">
+                <span id="nameText"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <div class = "input-group">
+                <input type="password" class="form-control" id="password" name="password" th:field="*{password}"  placeholder="영문,숫자 조합 6~16자">
+                <span id="pwdNew"></span>
+            </div>
+        </div>
+
+<!--        <div class="form-group">-->
+<!--            <label for="pwConfirm">비밀번호 확인</label>-->
+<!--            <div class = "input-group">-->
+<!--                <input type="password" class="form-control" id="pwConfirm" name="pwConfirm" th:field="*{password}"  placeholder="비밀번호 확인">-->
+<!--                <span id="pwdNewConfirm"></span>-->
+<!--            </div>-->
+<!--        </div>-->
+
+            <div class="form-group">
+                    <input type="submit" id="button1" class="btn btn-primary" value="가입완료">
+                    <button type="button" class="btn btn-primary" onClick="location.href='/'">취소</button>
+            </div>
+    
+</form>
+
+<script>
+
+    var pwdChk = false; //패스워드
+    var pwdConfirmChk = false; //비밀번호 확인
+    var nameChk = false; //이름
+    var emailChk = false; //이메일
+    var emailConfirmChk = false; //이메일 확인 체크
+
+    $(function (){
+        var $emailText = $("#emailText");
+        var $nameText = $("#nameText");
+        var $password = $("#password");
+        var $pwdNew = $("#pwdNew");
+        var $userName = $("#userName");
+        var $email = $("#email");
+        var $loginType = $("#loginType");
+
+        var $checkEmail = $("#checkEmail");//인증번호 발송 버튼
+        var $emailConfirm = $("#emailConfirm"); //인증번호 확인 input
+        var $emailConfirmText = $("#emailConfirmText"); //인증번호 확인 text
+
+        //이메일 체크
+        $email.on("keyup", function () {
+            let regExpEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+            if (!regExpEmail.test($email.val())) {
+                emailChk = false;
+                $emailText.html("<span id='chkEmail'>이메일 형식이 아닙니다.</span>");
+
+                $("#chkEmail").css({
+                    "color": "#FA3E3E",
+                    "font-weight": "bold",
+                    "font-size": "10px"
+                })
+            } else { //공백 아니면 중복 체크
+                $.ajax({
+                    type: "POST",
+                    url: "/user/save/id-exists",
+                    data: {
+                        "type": "member",
+                        "email": $email.val(),
+                        "loginType" : $loginType.val()
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            emailChk = false;
+                            $emailText.html("<span id='check'>이미 존재하는 이메일 입니다.</span>")
+                            $("#check").css({
+                                "color": "#FA3E3E",
+                                "font-weight": "bold",
+                                "font-size": "10px"
+                            })
+                            console.log("중복 아이디");
+                        } else {
+                            emailChk = true;
+                            $emailText.html("<span id='check'>사용 가능한 이메일 입니다.</span>")
+
+                            $("#check").css({
+                                "color": "#0D6EFD",
+                                "font-weight": "bold",
+                                "font-size": "10px"
+                            })
+
+                            console.log("중복 아닌 아이디");
+                        }
+                    } //ajax success end
+                }) //ajax end
+            }
+        });
+
+        //이름 체크
+        $userName.on("keyup", function (){
+            let regExpName = /^[가-힣]{2,8}$/; // 한글 이름 2~4자 이내
+            if(!regExpName.test($userName.val())){
+                nameChk = false;
+                $nameText.html("<span id='check'>이름은 한글 2~8자 이여야 합니다.</span>");
+
+                $("#check").css({
+                    "color": "#FA3E3E",
+                    "font-weight": "bold",
+                    "font-size": "10px"
+                })
+            } else {
+                nameChk = true;
+                $nameText.html("<span id='check'>일치</span>")
+
+                $("#check").css({
+                    "color": "#0D6EFD",
+                    "font-weight": "bold",
+                    "font-size": "10px"
+                })
+            }
+        }) //이름 체크 end
+
+        //비밀번호 정규식 및 체크
+        $password.on("keyup", function (){
+            let regExp = /^[A-Za-z0-9]{6,16}$/; //숫자와 문자 포함 형태의 6~12자리 이내의 암호화 정규식
+            if(!regExp.test($password.val())){
+                pwdChk = false;
+                $("#pwdNew").html("<span id='chkPwd'>숫자,문자 포함 6~16자리로 입력하여 주시기 바랍니다.</span>")
+                $("#chkPwd").css({
+                    "color": "#FA3E3E",
+                    "font-weight": "bold",
+                    "font-size": "10px"
+                })
+
+            } else {
+                pwdChk = true;
+                $("#pwdNew").html("<span id='chkPwd'>OK</span>")
+                $("#chkPwd").css({
+                    "color": "#0D6EFD",
+                    "font-weight": "bold",
+                    "font-size": "10px"
+                })
+
+
+            }
+        }) //비밀번호 정규식 end
+
+        //이메일 인증번호 전송
+        $checkEmail.click(function(){
+            if($email.val() == ""){
+                alert("이메일이 입력 되지 않았습니다.");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/user/emailConfirm",
+                    data: {
+                       "email" : $email.val()
+                    },
+                    success : function (data) {
+                        alert("해당 이메일로 인증번호 발송이 되었습니다.");
+                        console.log("data -> " + data);
+                        chkEmailConfirm(data, $emailConfirm, $emailConfirmText);
+                    }
+                })
+            }
+        }); //이메일 인증 end
+
+
+    //이메일 인증 번호 체크 함수
+    function chkEmailConfirm(data, $emailConfirm, $emailConfirmText){
+        $emailConfirm.on("keyup", function(){
+            if(data != $emailConfirm.val()){
+                emailConfirmChk = false;
+                $emailConfirmText.html("<span id='emailConfirmChk'>인증번호가 일치하지 않습니다</span>")
+                $("#emailConfirmChk").css({
+                    "color" : "#FA3E3E",
+                    "font-weight" : "bold",
+                    "font-size" : "10px"
+                })
+
+                // console.log("중복 아이디");
+
+            } else { // 아니면 중복 아님
+                emailConfirmChk = true;
+                $emailConfirmText.html("<span id='emailConfirmChk'>인증번호 확인 완료</span>")
+
+                $("#emailConfirmChk").css({
+                    "color" : "#0D6EFD",
+                    "font-weight" : "bold",
+                    "font-size" : "10px"
+                })
+             }
+          })
+       }
+
+    }); // function end
+
+    function formSubmit() {
+        if (!emailChk) {
+            $("#emailText").text("이메일을 입력해주세요.");
+            $("#emailText").css("color", "red");
+            $("#email").focus();
+            return false;
+        }else if (!emailConfirmChk) {
+            $("#emailConfirmText").text("이메일 인증번호 확인을 해주세요.");
+            $("#emailConfirmText").css("color", "red");
+            $("#emailConfirm").focus();
+            return false;
+        }else if (!nameChk) {
+            $("#nameText").text("이름을 입력해 주시기 바랍니다.");
+            $("#nameText").css("color", "red");
+            $("#userName").focus();
+            return false;
+        }else if (!pwdChk) {
+            $("#pwdNew").text("비밀번호를 입력해 주시기 바랍니다.");
+            $("#pwdNew").css("color", "red");
+            $("#password").focus();
+            return false;
+        }else {
+            alert("회원가입 완료!");
+            return true;
+        }
+    }
+
+</script>
+</body>
+</html>

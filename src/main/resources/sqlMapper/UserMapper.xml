@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.promotion.mapper.UserMapper">
+
+    <!-- 사용자 권한만 조회하기(MemberAuthority) -->
+    <select id="findMemberAuthorities" parameterType="String" resultType="MemberAuthority">
+        SELECT ua.AUTH_ID,
+               ua.USER_ID
+        FROM   USER_AUTHORITY as ua
+            INNER JOIN USER as u
+            ON u.USER_ID = ua.USER_ID
+        WHERE u.user_email = #{email}
+        AND   u.login_type = #{loginType}
+    </select>
+
+    <!-- 사용자 조회(권한 join) -->
+    <select id="findMemberAuthInfo" parameterType="String" resultType="Member">
+        SELECT
+            *
+        FROM USER as u
+                 INNER JOIN user_authority as au
+                            ON u.user_id = au.USER_ID
+                 INNER JOIN authority as a
+                            ON a.auth_id = au.AUTH_ID
+        WHERE
+              u.user_email = #{email}
+        AND   u.login_type = #{loginType};
+    </select>
+
+
+    <!-- USER 테이블과 SOCIAL_INFO 테이블 조인한 정보 조회 -->
+    <select id="findUserAndSocialInfo" parameterType="String" resultType="SocialInfo">
+        SELECT SI.*,
+               U.USER_ID
+        FROM SOCIAL_INFO AS SI
+         INNER JOIN USER U
+          ON  SI.USER_ID = U.USER_ID
+        WHERE U.USER_EMAIL = #{email}
+    </select>
+
+    <!-- 소셜 로그인 사용자 권한 조회(JOIN) -->
+    <select id="findSocialMemberAndAuth" parameterType="String" resultType="MemberAuthority">
+        SELECT u.user_id, u.user_name, ua.auth_id,
+               si.social_type
+        FROM USER as U
+                 INNER JOIN SOCIAL_INFO AS SI
+                            ON U.USER_ID = SI.USER_ID
+                 INNER JOIN user_authority AS UA
+                            ON SI.USER_ID = UA.USER_ID
+                 INNER JOIN authority a
+                            ON A.AUTH_ID = UA.AUTH_ID
+        WHERE U.USER_EMAIL = #{email}
+    </select>
+
+
+    <!-- 사용자 등록 -->
+    <insert id="insertMember" parameterType="Member" useGeneratedKeys="true" keyProperty="userId" >
+        insert into user
+            (
+             USER_NAME,
+             LOGIN_TYPE,
+             USER_EMAIL,
+             PASSWORD,
+             PHONE_NUMBER,
+             ADDRESS,
+             INTGR_USER_ID,
+             INTGR_DT
+             )
+        values
+            (
+             #{userName},
+             #{loginType},
+             #{email},
+             #{password},
+             #{phoneNumber},
+             #{address},
+             #{intgrUserId},
+             #{intgrDt}
+             )
+    </insert>
+
+    <!-- 사용자 권한 저장 -->
+    <insert id="insertMemberAuth">
+        INSERT INTO USER_AUTHORITY
+        (
+            USER_ID,
+            AUTH_ID
+
+        )
+        VALUES
+        (
+            #{userId},
+            #{authId}
+        )
+    </insert>
+
+    <!-- 소셜 로그인 사용자 등록 -->
+    <insert id="insertSNSMember" parameterType="Member"  useGeneratedKeys="true" keyProperty="userId">
+        insert into user
+            (
+                 USER_NAME,
+                 USER_EMAIL,
+                 LOGIN_TYPE
+            )
+        values
+            (
+                 #{userName},
+                 #{email},
+                 #{loginType}
+            )
+    </insert>
+
+    <!--소셜 유저 정보 저장 -->
+    <insert id="insertSocialInfo" parameterType="SocialInfo">
+        INSERT INTO SOCIAL_INFO
+            (
+                 USER_ID,
+                 SOCIAL_ID,
+                 SOCIAL_TYPE
+            )
+        VALUES
+            (
+                 #{userId},
+                 #{socialId},
+                 #{socialType}
+            )
+
+    </insert>
+
+    <!-- 소셜 로그인 유저 정보 조회(USER 테이블 JOIN) -->
+    <select id="findSocialMember" resultType="Member" parameterType="String">
+        SELECT
+            U.USER_ID,
+            U.USER_NAME,
+            U.USER_EMAIL,
+            U.LOGIN_TYPE,
+            SI.USER_ID
+        FROM USER AS U
+         INNER JOIN SOCIAL_INFO AS SI
+          ON U.USER_ID = SI.USER_ID
+        WHERE U.USER_EMAIL = #{email}
+        AND   U.LOGIN_TYPE = "소셜가입"
+        AND   SI.SOCIAL_ID = #{socialId}
+    </select>
+
+    <!-- 회원가입 시 아이디 중복 확인 boolean 타입 -->
+    <select id="userIdExist" parameterType="String" resultType="boolean">
+        SELECT IF(COUNT(*) >= 1 , 1 ,0)
+        FROM USER
+        WHERE user_email = #{email}
+        AND login_type = "자사가입"
+    </select>
+
+    <!-- 유저 로그인 타입 조회 -->
+    <select id="findMemberLoginType" resultType="String">
+        SELECT LOGIN_TYPE
+        FROM   USER
+        WHERE  USER_EMAIL = #{email}
+        AND    LOGIN_TYPE = #{loginType}
+    </select>
+
+    <!-- 자사 유저 로그인 유효성 검사 -->
+    <select  id="loginEmailPasswordNullCheck" resultType="Member" parameterType="String">
+        SELECT USER_EMAIL, PASSOWRD
+        FROM   USER
+        WHERE  USER_EMAIL = #{email}
+        AMD    PASSWORD   = #{passowrd}
+    </select>
+
+    <select id = "findMember" resultType="Member" parameterType="String">
+        select * from user
+        where user_email = #{email};
+    </select>
+</mapper>
