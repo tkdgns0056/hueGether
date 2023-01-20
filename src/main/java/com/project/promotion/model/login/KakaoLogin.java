@@ -1,6 +1,5 @@
 package com.project.promotion.model.login;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class KakaoLogin implements SocialLogin {

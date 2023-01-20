@@ -1,4 +1,4 @@
-package com.project.promotion.controller;
+package com.project.promotion.controller.admin;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;

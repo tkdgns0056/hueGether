@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.promotion.mapper.OrderMapper">
+
+    <resultMap id="Business" type="Business">
+        <result column="business_id" property="businessId"/>
+        <result column="company_name" property="companyName"/>
+    </resultMap>
+
+    <resultMap id="Room" type="Room">
+        <result column="business_id" property="businessId"/>
+        <result column="room_id" property="roomId"/>
+        <result column="room_price" property="roomPrice"/>
+        <result column="room_name" property="roomName"/>
+        <collection property="business" resultMap="Business"/>
+    </resultMap>
+
+    <resultMap id="Member" type="Member">
+        <result column="user_email" property="email"/>
+    </resultMap>
+
+<!--    <resultMap id="Reservation" type="Reservation">-->
+<!--        <result column="reservation_id" property="reservationId"/>-->
+<!--        <result column="room_id" property="roomId"/>-->
+<!--        <result column="business_id" property="businessId"/>-->
+<!--        <result column="user_email" property="email"/>-->
+<!--        <result column="check_in" property="checkIn"/>-->
+<!--        <result column="check_out" property="checkOut"/>-->
+<!--        <result column="payment" property="payment"/>-->
+<!--        <result column="payment_price" property="paymentPrice"/>-->
+<!--        <result column="reservation_status" property="reservationStatus"/>-->
+<!--        <collection property="member" resultMap="Member"/>-->
+<!--        <collection property="room" resultMap="Room"/>-->
+<!--        <collection property="business" resultMap="Business"/>-->
+<!--    </resultMap>-->
+
+    <!-- 객실 예약시 넘겨주는 쿼리(숙소 리스트에서 체크인아웃 선택 후 예약 폼으로 정보 뿌려줌) -->
+    <select id="getOrderRoom" resultMap="Room" resultType="Room" parameterType="int">
+        SELECT B.BUSINESS_ID, R.ROOM_ID, B.COMPANY_NAME, R.ROOM_NAME, R.ROOM_PRICE
+        FROM ROOM AS R
+        INNER JOIN BUSINESS AS B
+        ON R.BUSINESS_ID = B.BUSINESS_ID
+        WHERE R.ROOM_ID = #{roomId}
+    </select>
+
+    <!-- 예약 INSERT -->
+    <insert id="insertReserved">
+        INSERT INTO RESERVATION (RESERVATION_ID, BUSINESS_ID, ROOM_ID, USER_ID, RESERVATION_STATUS, PAYMENT,
+                                 PAYMENT_PRICE, CHECK_IN, CHECK_OUT)
+
+        VALUES( #{reservationId}, #{businessId}, #{roomId}, #{userId}, #{reservationStatus}, #{payment},
+                #{paymentPrice}, #{checkIn}, #{checkOut}
+               );
+    </insert>
+
+</mapper>

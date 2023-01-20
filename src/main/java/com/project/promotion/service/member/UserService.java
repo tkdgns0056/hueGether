@@ -2,6 +2,7 @@ package com.project.promotion.service.member;
 
 import com.project.promotion.mapper.UserMapper;
 import com.project.promotion.model.auth.Authority;
+import com.project.promotion.model.auth.PrincipalDetails;
 import com.project.promotion.model.login.LoginType;
 import com.project.promotion.model.member.Member;
 import com.project.promotion.model.auth.MemberAuthority;
@@ -51,6 +52,7 @@ public class UserService {
 
             System.out.println("가입한 유저 정보 = " + member.getUserName() + "," + authority.getAuthId());
         }
+
 
          //아이디 중복 체크
         public boolean isUserIdExist(String email, String loginType){

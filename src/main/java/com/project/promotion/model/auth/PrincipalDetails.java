@@ -1,10 +1,12 @@
 package com.project.promotion.model.auth;
 
 import com.project.promotion.model.login.OAuthAttributes;
-import com.project.promotion.model.login.SocialInfo;
 import com.project.promotion.model.member.Member;
+import com.project.promotion.model.login.SocialInfo;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -12,7 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class PrincipalDetails implements UserDetails, OAuth2User{
 
@@ -26,7 +29,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 
     //일반 유저 로그인 시 사용하는 생성자
     public PrincipalDetails(Member member){
-
+        super();
         this.member = member;
     }
 
@@ -55,7 +58,6 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 
     @Override
     public String getUsername() {
-
         return String.valueOf(member.getUserId());
     }
 
@@ -90,8 +92,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
     }
     @Override
     public String getName() {
-
-       return String.valueOf(this.member.getUserId());
+       return member.getUserName();
     }
 
 }

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- bootstrap 5 css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <!-- 제이쿼리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+            integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+            crossorigin="anonymous" type="text/javascript"></script>
+    <!-- 아임포트 -->
+    <script src ="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js" type="text/javascript"></script>
+</head>
+<body>
+
+<!-- 헤더 / navbar start -->
+<nav class="navbar navbar-expand-md bg-primary navbar-dark">
+
+    <div class="container">
+        <a href="#" class="navbar-brand">HueGether</a>
+        <form th:action="@{/search/room/list}" method="get"  class="d-flex m-2">
+            <input class="form-control me-2" type="text" name="keyword" placeholder="지역 및 숙박업체를 입력해보세요" aria-label="Search">
+            <!--            <button type="submit"><img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"></button>-->
+            <input value="검색" type="submit" class="submit btn btn-outline-dark">
+        </form>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav-menu"
+                aria-controls="navbarNav-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav-menu">
+            <ul class="navbar-nav text-center">
+
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link active" aria-current="page" th:href="@{/user/login}">로그인</a>
+                </li>
+
+                <li class="nav-item" sec:authorize ="isAuthenticated()">
+                    <input type="hidden" id="userId" th:value="${member.member.userId}">
+                    <p th:text="|${member.member.userName}님|"></p>
+                    <a class="nav-link active" aria-current="page" th:href=" @{/user/logout}">로그아웃</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/save}">회원가입</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">파트너신청</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- 헤더 / navbar end -->
+<br><br><br>
+        <tr>
+            <tbody>
+
+                <input type="hidden"  id="roomId" name="roomId" th:value="${room.roomId}">
+                <input type="hidden"  id="businessId" name="businessId" th:value="${room.businessId}">
+
+                <div class="form-group">
+                    <span>체크인:</span> <strong th:value="${#dates.format(dateRange.checkIn, 'yyyy-MM-dd')}" th:text="${#dates.format(dateRange.checkIn,'yyyy-MM-dd')}"></strong>
+                    <input type="hidden" id="checkIn" name="checkIn" th:value="${#dates.format(dateRange.checkIn, 'yyyy-MM-dd')}">
+                </div>
+
+                <div class="form-group">
+                    <span>체크아웃:</span> <strong th:value="${#dates.format(dateRange.checkOut, 'yyyy-MM-dd')}" th:text="${#dates.format(dateRange.checkOut,'yyyy-MM-dd')}"></strong>
+                    <input type="hidden" id="checkOut" name="checkOut" th:value="${#dates.format(dateRange.checkOut, 'yyyy-MM-dd')}">
+                </div>
+
+                <div class="from-group">
+                    <input id="companyName" type="text" class="form-control" th:value="${room.business.companyName}" readonly="readonly">
+                </div>
+
+                <div class="from-group">
+                    <input id="roomName" type="text" class="form-control" th:value="${room.roomName}" readonly="readonly">
+                </div>
+
+                <div class="from-group">
+                    <input id="roomPrice" name="roomPrice" type="text" class="form-control" th:value="${room.roomPrice}" readonly="readonly">
+                </div>
+            </tbody>
+        </tr>
+
+        <h3>예약자 정보</h3>
+            <div class="from-group">
+                    예약자 이름: <input id="userName" type="text" class="form-control" th:value="${member.member.userName}" readonly="readonly">
+                </div>
+            </div>
+            <br>
+<!--            휴대폰 번호: <strong th:text ="${principal}"></strong>-->
+
+                <h3>결제수단 선택</h3>
+                <select id="payment_list">
+                    <option name="payment" id="kakaopay" th:value="KAKAOPAY">카카오페이</option>
+                    <option name="payment" id="card" th:value="CARD">신용/체크카드</option>
+                </select>
+                <br><br>
+
+                <button id="payBtn" th:onclick="requestPay()" class="btn btn-primary justify-content-center" style="display:inline-block;  margin-right:10%;">결제하기</button>
+
+<script>
+
+    function requestPay(){
+
+        IMP.init('imp60038017'); //iamport 대신 자신의 "가맹점 식별코드"를 사용
+        IMP.request_pay({
+            pg: "kakaopay",
+            pay_method: $("#kakaopay").val(),
+            merchant_uid : 'merchant_'+new Date().getTime(),
+            name : 'hueGether 결제',
+            amount : $("#roomPrice").val()
+
+        }, function (rsp){ // 콜백 함수
+            if(rsp.success){
+                $.ajax({
+                    type: "POST",
+                    url: "/order/proc",
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    header:{"Content-Type":"application/json"},
+                    dateType:'json',
+                    data:{
+                           reservationId :rsp.imp_uid,
+                           payment: $("#kakaopay").val(),
+                           roomId: $("#roomId").val(),
+                           businessId : $("#businessId").val(),
+                           userId : $("#userId").val(),
+                           checkIn: $("#checkIn").val(),
+                           checkOut: $("#checkOut").val()
+                        },
+                }).done(function (data){
+                    location.href='/order/detail'+data
+                })
+            } else {
+                alert('결제 실패')
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

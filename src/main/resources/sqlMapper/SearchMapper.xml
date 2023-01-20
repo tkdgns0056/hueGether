@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.promotion.mapper.SearchMapper">
+    
+    <resultMap  type="Room" id="Room">
+        <result column="business_Id" property="businessId"/>
+        <result column="room_price" property="roomPrice"/>
+    </resultMap>
+
+    <resultMap type="Business" id="Business">
+        <result column="business_id" property="businessId"/>
+        <result column="company_name" property="companyName"/>
+        <result column="company_address" property="companyAddress"/>
+        <collection property="room" resultMap="Room"/>
+    </resultMap>
+    
+
+    <!-- 메인 페이지에서 숙소명 및 지역으로 검샋 시 낮은 가격순으로 리스트 보여주는 쿼리문 -->
+    <select id="searchHotelList" resultType="Business" resultMap="Business" parameterType="String">
+
+       <!-- 메인 페이지에서 검색 -->
+        SELECT B.BUSINESS_ID, B.COMPANY_NAME , B.COMPANY_ADDRESS, MIN(R.ROOM_PRICE) AS room_Price
+        FROM ROOM AS R
+        INNER JOIN BUSINESS AS B
+        ON R.BUSINESS_ID = B.BUSINESS_ID
+        <if test="condition != null">
+            <if test="condition == companyName">
+                WHERE B.COMPANY_NAME LIKE CONCAT( #{keyword}, '%')
+            </if>
+            <if test="condition == companyAddress">
+                OR B.COMPANY_ADDRESS LIKE CONCAT( #{keyword}, '%')
+            </if>
+        </if>
+        GROUP BY B.COMPANY_NAME, B.COMPANY_ADDRESS
+        ORDER BY R.ROOM_PRICE;
+    </select>
+
+
+</mapper>

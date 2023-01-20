@@ -1,32 +1,103 @@
 <!DOCTYPE HTML>
 <!-- 시큐리티 이용하기 위한 설정-->
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
-    <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
-          href="../css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- bootstrap 5 css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
 </head>
 <body>
-<div class="container" style="max-width: 600px">
-    <div class="py-5 text-center">
-        <h2>홈 화면</h2>
-    </div>
-    <div class="row">
-        <div class="col">
-            <button class="w-100 btn btn-secondary btn-lg" type="button"
-                    th:onclick="|location.href='@{/user/save}'|">
-                회원 가입
-            </button>
+<!-- 헤더 / navbar start -->
+<nav class="navbar navbar-expand-md bg-primary navbar-dark">
+
+    <div class="container">
+        <a href="#" class="navbar-brand">HueGether</a>
+        <form th:action="@{/search/room/list}" method="get"  class="d-flex m-2">
+            <input class="form-control me-2" type="text" name="keyword" placeholder="지역 및 숙박업체를 입력해보세요" aria-label="Search">
+<!--            <button type="submit"><img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"></button>-->
+            <input value="검색" type="submit" class="submit btn btn-outline-dark">
+        </form>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav-menu"
+                aria-controls="navbarNav-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav-menu">
+            <ul class="navbar-nav text-center">
+
+               <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link active" aria-current="page" th:href="@{/user/login}">로그인</a>
+               </li>
+
+                <li class="nav-item" sec:authorize ="isAuthenticated()">
+                    <input type="hidden" th:value="${member.member.userId}">
+                    <p th:text="|${member.member.userName}님|"></p>
+                    <a class="nav-link active" aria-current="page" th:href=" @{/user/logout}">로그아웃</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/save}">회원가입</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">파트너신청</a>
+                </li>
+            </ul>
         </div>
-        <div class="col">
-            <button class="w-100 btn btn-dark btn-lg"
-                    onclick="location.href='items.html'"
-                    th:onclick="|location.href='@{/user/login}'|" type="button">
-                로그인
-            </button>
-        </div>
     </div>
-    <hr class="my-4">
-</div> <!-- /container -->
+</nav>
+<!-- 헤더 / navbar end -->
+
+<!--        <div class="container">-->
+<!--            <div class="py-5 text-center">-->
+<!--                <h2>HueGether</h2>-->
+
+<!--                &lt;!&ndash; 메인 페이지 검색 창 &ndash;&gt;-->
+<!--                <form th:action="@{/search/room/list}" method="get">-->
+<!--                    <div class="search">-->
+<!--                        <input type="text" name="keyword" placeholder="지역 및 숙박업체 이름으로 검색해보세요.">-->
+<!--                        <button type="submit"><img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"></button>-->
+<!--                    </div>-->
+<!--                </form>-->
+
+<!--                <div class="row">-->
+<!--                    <div class="col">-->
+<!--                        <button class="w-100 btn btn-secondary btn-lg" type="button"-->
+<!--                                th:onclick="|location.href='@{/user/save}'|">-->
+<!--                            회원 가입-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <div class="col">-->
+<!--                        <button class="w-100 btn btn-dark btn-lg"-->
+<!--                                onclick="location.href='items.html'"-->
+<!--                                th:onclick="|location.href='@{/user/login}'|" type="button">-->
+<!--                            로그인-->
+<!--                        </button>-->
+<!--                    </div>-->
+
+<!--                    <div class="col">-->
+<!--                        <button class="w-100 btn btn-dark btn-lg"-->
+<!--                                onclick="location.href='/business/businessMain.html"-->
+<!--                                th:onclick="|location.href='@{/business/main}'|" type="button">-->
+<!--                            비즈니스 신청하기-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div> &lt;!&ndash;/row &ndash;&gt;-->
+<!--            </div>-->
+<!--        </div> &lt;!&ndash; /container &ndash;&gt;-->
+
+
+<!-- bootstrap 5 js bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+</script>
 </body>
 </html>

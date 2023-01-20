@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- 부트스트랩 적용 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <!-- JQuery UI css파일 -->
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
+    <!--  date range Picker css -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <!-- bootstrap 5 js bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous">
+    </script>
+    <!-- JQuery 기본 js 파일-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- jQuery UI 라이브러리 js 파일-->
+    <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
+
+    <!-- date range Picker js -->
+    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <!-- 데이트 피커 라이브러리-->
+    <style>
+        .carousel {
+            position: relative;
+        }
+        .carousel-item img {
+            object-fit: cover;
+        }
+        #carousel-thumbs {
+           background: rgba(255,255,255,.3);
+            bottom: 0;
+            left: 0;
+            padding: 0 50px;
+            right: 0;
+        }
+        #carousel-thumbs img {
+            border: 5px solid transparent;
+            cursor: pointer;
+        }
+        #carousel-thumbs img:hover {
+            border-color: rgba(255,255,255,.3);
+        }
+        #carousel-thumbs .selected img {
+            border-color: #fff;
+        }
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 60px;
+        }
+        @media all and (max-width: 767px) {
+            .carousel-container #carousel-thumbs img {
+                border-width: 3px;
+            }
+        }
+        @media all and (min-width: 576px) {
+            .carousel-container #carousel-thumbs {
+                position: absolute;
+            }
+        }
+        @media all and (max-width: 576px) {
+            .carousel-container #carousel-thumbs {
+                background: #ccccce;
+            }
+        }
+
+        /* 캘린더 우측, 선택한날짜 숨김  */
+        /*.drp-calendar.right, .drp-selected {*/
+        /*    display: none !important;*/
+        /*}*/
+    </style>
+
+</head>
+
+<body>
+<!-- 헤더 / navbar start -->
+<nav class="navbar navbar-expand-md bg-primary navbar-dark">
+
+    <div class="container">
+        <a href="#" class="navbar-brand">HueGether</a>
+        <form th:action="@{/search/room/list}" method="get"  class="d-flex m-2">
+            <input class="form-control me-2" type="text" name="keyword" placeholder="지역 및 숙박업체를 입력해보세요" aria-label="Search">
+            <!--            <button type="submit"><img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"></button>-->
+            <input value="검색" type="submit" class="submit btn btn-outline-dark">
+        </form>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav-menu"
+                aria-controls="navbarNav-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav-menu">
+            <ul class="navbar-nav text-center">
+
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link active" aria-current="page" th:href="@{/user/login}">로그인</a>
+                </li>
+
+                <li class="nav-item" sec:authorize ="isAuthenticated()">
+                    <input type="hidden" th:value="${member.member.userId}">
+                    <p th:text="|${member.member.userName}님|"></p>
+                    <a class="nav-link active" aria-current="page" th:href=" @{/user/logout}">로그아웃</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/save}">회원가입</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">파트너신청</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- 헤더 / navbar end -->
+
+<br>
+    <div class="container mt-5">
+            <div class="row">
+                <div class="col">
+                    <div class="carousel-container position-relative row">
+                         <!-- 이미지 슬라이더 -->
+                        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active" data-slide-number="0">
+                                    <img src="https://source.unsplash.com/Pn6iimgM-wo/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/Pn6iimgM-wo/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="1">
+                                    <img src="https://source.unsplash.com/tXqVe7oO-go/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/tXqVe7oO-go/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="2">
+                                    <img src="https://source.unsplash.com/qlYQb7B9vog/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/qlYQb7B9vog/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="3">
+                                    <img src="https://source.unsplash.com/QfEfkWk1Uhk/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/QfEfkWk1Uhk/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="4">
+                                    <img src="https://source.unsplash.com/CSIcgaLiFO0/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/CSIcgaLiFO0/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="5">
+                                    <img src="https://source.unsplash.com/a_xa7RUKzdc/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/a_xa7RUKzdc/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="6">
+                                    <img src="https://source.unsplash.com/uanoYn1AmPs/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/uanoYn1AmPs/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="7">
+                                    <img src="https://source.unsplash.com/_snqARKTgoc/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/_snqARKTgoc/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="8">
+                                    <img src="https://source.unsplash.com/M9F8VR0jEPM/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/M9F8VR0jEPM/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                                <div class="carousel-item" data-slide-number="9">
+                                    <img src="https://source.unsplash.com/Q1p7bh3SHj8/1600x900/" class="d-block w-100" alt="..." data-remote="https://source.unsplash.com/Q1p7bh3SHj8/" data-type="image" data-toggle="lightbox" data-gallery="example-gallery">
+                                </div>
+                            </div> <!-- carousel-inner -->
+
+                            <!-- carousel navigation -->
+                            <div id="carousel-thumbs" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <div class="row mx-0">
+                                            <div id="carousel-selector-0" class="thumb col-4 col-sm-2 px-1 py-2 selected" data-target="#myCarousel" data-slide-to="0">
+                                                <img src="https://source.unsplash.com/Pn6iimgM-wo/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-1" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="1">
+                                                <img src="https://source.unsplash.com/tXqVe7oO-go/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-2" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="2">
+                                                <img src="https://source.unsplash.com/qlYQb7B9vog/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-3" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="3">
+                                                <img src="https://source.unsplash.com/QfEfkWk1Uhk/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-4" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="4">
+                                                <img src="https://source.unsplash.com/CSIcgaLiFO0/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-5" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="5">
+                                                <img src="https://source.unsplash.com/a_xa7RUKzdc/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                        </div> <!--row mx-0-->
+                                    </div><!--carousel-item active-->
+
+                                    <div class="carousel-item">
+                                        <div class="row mx-0">
+                                            <div id="carousel-selector-6" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="6">
+                                                <img src="https://source.unsplash.com/uanoYn1AmPs/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-7" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="7">
+                                                <img src="https://source.unsplash.com/_snqARKTgoc/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-8" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="8">
+                                                <img src="https://source.unsplash.com/M9F8VR0jEPM/600x400/" class="img-fluid" alt="...">
+                                            </div>
+                                            <div id="carousel-selector-9" class="thumb col-4 col-sm-2 px-1 py-2" data-target="#myCarousel" data-slide-to="9">
+                                                <img src="https://source.unsplash.com/Q1p7bh3SHj8/600x400/" class="img-fluid" alt="...">
+                                            </div>
+
+                                            <div class="col-2 px-1 py-2"></div>
+                                            <div class="col-2 px-1 py-2"></div>
+                                        </div> <!-- orw mx-0 -->
+                                    </div> <!-- carousel-item -->
+                                </div><!-- carousel-inner-->
+
+                                <a class="carousel-control-prev" href="#carousel-thumbs" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+<!--                                    <span class="sr-only">Previous</span>-->
+                                </a>
+                                <a class="carousel-control-next" href="#carousel-thumbs" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+<!--                                    <span class="sr-only">Next</span>-->
+                                </a>
+
+                            </div><!-- carousel-thumbs -->
+                        </div> <!--myCarousel -->
+                    </div><!--carousel-container position-relative row-->
+                </div> <!--col-->
+
+                <div class="col">
+                    <div class="p-3 border bg-light">업체이름</div>
+                </div>
+            </div><!--row-->
+
+            <br><br><br><br><br>
+
+            <div class="container">
+                <!-- 탭메뉴 -->
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="reservation">객실 및 예약</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="hotelInfo">숙소정보</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="review">리뷰</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active" id="reservation">
+                        <br>
+                        <tbody>
+                        <!-- 달력 -->
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                    <span class="input-group-addon">
+                                    <i class="fa fa-calendar bigger-110"></i>
+                                    </span>
+                                <!-- 데이트피커 받을 부분 -->
+                                    <input type="text" id="daterange" class="form-control" autocomplete="off"/>
+                            </div>
+                        </div> <!--달력 end -->
+
+                            <tr th:each= "room : ${roomList}">
+                                <form action="/order/new" method="get" th:object="${dateRange}">
+                                    <input type="hidden" name="roomId" th:value="${room.roomId}">
+                                    <input type="hidden" name="checkIn" th:field="${dateRange.checkIn}">
+                                    <input type="hidden" name="checkOut" th:field="${dateRange.checkOut}">
+                                    <td th:text="${room.roomPrice}"></td>
+                                    <td th:text="${room.roomName}"></td>
+                                    <td th:text="${room.roomCount}"></td>
+                                    <div class="room_reservation_button">
+                                        <button type="submit">예약하기</button>
+                                    </div>
+                                </form>
+                            </tr>
+                        </tbody>
+                    </div>
+
+
+                    <div class="tab-pane fade" id="hotelInfo">
+                        <p>Nunc vitae turpis id nibh sodales commodo et non augue. Proin fringilla ex nunc. Integer tincidunt risus ut facilisis tristique.</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="review">
+                        <p>Curabitur dignissim quis nunc vitae laoreet. Etiam ut mattis leo, vel fermentum tellus. Sed sagittis rhoncus venenatis. Quisque commodo consectetur faucibus. Aenean eget ultricies justo.</p>
+                    </div>
+
+                </div>
+            </div>
+
+    </div>
+
+
+    <script>
+        // $(document).ready(function(){
+
+        jQuery.browser = {};
+
+            $(function(){
+                $('#myCarousel').carousel({
+                    interval: false
+                });
+
+                $('#carousel-thumbs').carousel({
+                    interval: false
+                });
+
+                $('[id^=carousel-selector-]').click(function () {
+                    var id_selector = $(this).attr('id');
+                    var id = parseInt(id_selector.substr(id_selector.lastIndexOf('-') + 1));
+                    $('#myCarousel').carousel(id);
+                });
+
+
+                if ($(window).width() < 575) {
+                    $('#carousel-thumbs .row div:nth-child(4)').each(function () {
+                        var rowBoundary = $(this);
+                        $('<div class="row mx-0">').insertAfter(rowBoundary.parent()).append(rowBoundary.nextAll().addBack());
+                    });
+                    $('#carousel-thumbs .carousel-item .row:nth-child(even)').each(function () {
+                        var boundary = $(this);
+                        $('<div class="carousel-item">').insertAfter(boundary.parent()).append(boundary.nextAll().addBack());
+                    });
+                }
+
+                // Hide slide arrows if too few items.
+                if ($('#carousel-thumbs .carousel-item').length < 2) {
+                    $('#carousel-thumbs [class^=carousel-control-]').remove();
+                    $('.machine-carousel-container #carousel-thumbs').css('padding', '0 5px');
+                }
+
+                // when the carousel slides, auto update
+                $('#myCarousel').on('slide.bs.carousel', function (e) {
+                    var id = parseInt($(e.relatedTarget).attr('data-slide-number'));
+                    $('[id^=carousel-selector-]').removeClass('selected');
+                    $('[id=carousel-selector-' + id + ']').addClass('selected');
+                });
+
+                // when user swipes, go next or previous
+                $('#myCarousel').swipe({
+                    fallbackToMouseEvents: true,
+                    swipeLeft: function (e) {
+                        $('#myCarousel').carousel('next');
+                    },
+                    swipeRight: function (e) {
+                        $('#myCarousel').carousel('prev');
+                    },
+                    allowPageScroll: 'vertical',
+                    preventDefaultEvents: false,
+                    threshold: 75
+                });
+
+                $('#myCarousel .carousel-item img').on('click', function (e) {
+                    var src = $(e.target).attr('data-remote');
+                    if (src) $(this).ekkoLightbox();
+                });
+            });
+
+        //datePicker
+        var $dateRange = $('#daterange');
+
+        $dateRange.daterangepicker();
+        $dateRange.on('apply.daterangepicker', function (ev, picker){
+
+            $('input[name="checkIn"]').val(picker.startDate.format('DD/MM/YYYY'));
+            $('input[name="checkOut"]').val(picker.endDate.format('DD/MM/YYYY'));
+        });
+
+
+
+                // $(function (){
+                //     $('input[name="datetime"]').daterangepicker({
+                //         "startDate" : "01/12/2023",
+                //         "endDate" : "01/13/2023",
+                //            "locale":{
+                //                "format": "YYYY-MM-DD",
+                //                "separator": " ~ ",
+                //                "applyLabel": "확인",
+                //                "cancelLabel": "취소",
+                //                "fromLabel" : "From",
+                //                "toLabel" : "To",
+                //                "weekLabel": "W",
+                //                "daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"],
+                //                "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                //                "opens" : 'left',
+                //                // "linkedCalendars" : "false"
+                //             }
+                //         }, function (start, end, label){
+                //                 $.ajax({
+                //                     url: "/oder/new",
+                //                     method : "GET",
+                //                     data: {from: start.form('YYYY-MM-DD'), to: end.format('YYYY-MM-DD')},
+                //                     success(result){
+                //
+                //                     }
+                //                 })
+                //         });
+                // });
+    </script>
+</body>
+</html>
+

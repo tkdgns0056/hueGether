@@ -1,10 +1,10 @@
 package com.project.promotion.handler.security;
 
-import com.project.promotion.exception.MemberIdException;
 import com.project.promotion.mapper.UserMapper;
 import com.project.promotion.model.auth.MemberAuthority;
 import com.project.promotion.model.auth.PrincipalDetails;
 import com.project.promotion.model.login.LoginType;
+import com.project.promotion.model.member.Member;
 import com.project.promotion.service.auth.PrincipalDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -38,7 +38,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         //비밀번호
         String password = (String) authentication.getCredentials();
 
+
         PrincipalDetails member = (PrincipalDetails) principalDetailsService.loadUserByUsername(userEmail);
+
 
         if(member == null){
             throw new InternalAuthenticationServiceException("존재하지 않은 회원입니다.");

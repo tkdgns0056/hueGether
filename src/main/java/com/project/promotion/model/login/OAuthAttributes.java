@@ -1,6 +1,5 @@
 package com.project.promotion.model.login;
 
-import com.project.promotion.model.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 

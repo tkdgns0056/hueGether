@@ -6,11 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
 
-
-@Repository
 @Mapper
 public interface UserMapper {
 
@@ -49,6 +45,6 @@ public interface UserMapper {
     // 유저 로그인 정보 조회
     public String findMemberLoginType(String email, String loginType);
 
-    public Member findMember(String email);
+    public Member findMember(String userEmail);
 
 }

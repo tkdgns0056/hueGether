@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>비즈니스 신청</title>
+
+</head>
+<body>
+<!--&lt;!&ndash; header &ndash;&gt;-->
+<!--<sec:authorize access="isAnonymous()">-->
+<!--    <jsp:include page="../main/header.jsp" />-->
+<!--</sec:authorize>-->
+<!--<sec:authorize access="hasRole('ROLE_USER')">-->
+<!--    <jsp:include page="../main/headerMember.jsp" />-->
+<!--</sec:authorize>-->
+<!--<sec:authorize access="hasRole('ROLE_MANAGER')">-->
+<!--    <jsp:include page="../main/headerCompany.jsp" />-->
+<!--</sec:authorize>-->
+
+<div class="content bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 contents bg-white" style="padding-left: 150px;">
+                <div class="col-md-8-custom company_register">
+                    <h1>비즈니스 신청</h1>
+                    <form action="/business/save" name="frm" method="post">
+                        <div class="mb-4">
+                            <!-- <h3>기업 인증</h3> -->
+                            <img src="../images/logo.png" alt="" />
+                        </div>
+                        <!-- <span>사업자 등록 번호</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cbin" id="ccbin">사업자 등록 번호를 입력해주세요(- 제외)</label>
+                            <input type="text" class="form-control" name="cbin" id="cbin">
+                        </div>
+                        <hr class="drivder">
+                        <div class="mb-4">
+                            <P>기업 정보</P>
+                        </div>
+                        <!-- <span>기업 명</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cname" id="ccname">기업명을 입력해주세요</label>
+                            <input type="text" class="form-control" name="cname" id="cname">
+                        </div>
+                        <!-- <span>대표자 명</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="ceo" id="cceo">대표자명을 입력해주세요</label>
+                            <input type="text" class="form-control" name="ceo" id="ceo">
+                        </div>
+
+                        <div class="form-group last mb-4 addr_input">
+                            <label for="caddr" id="ccaddr">기업 주소를 입력해주세요</label>
+                            <input type="text" class="form-control" name="caddr" id="caddr">
+                        </div>
+                        <!-- <span>기업 주소</span> -->
+                        <input type="button" class="btn btn-outline-primary addr_btn" id="findAddr" onclick="daumPostcode()" value="주소 찾기"><br>
+
+                        <!-- <span>상세 주소</span> -->
+                        <div class="form-group last mb-4 addr_detail">
+                            <label for="caddr2" id="ccaddr2">상세 주소를 입력해주세요</label>
+                            <input type="text" class="form-control" name="caddr2" id="caddr2">
+                        </div>
+                        <!-- <span>설립일</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="csetup" id="ccsetup">설립일을 입력해주세요(8자)</label>
+                            <input type="text" class="form-control" name="csetup" id="csetup">
+                        </div>
+                        <!-- <span>매출액</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="csales" id="ccsales">매출액을 입력해주세요</label>
+                            <input type="text" class="form-control" name="csales" id="csales">
+                        </div>
+                        <!-- <span>사원수</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cpeople" id="ccpeople">사원수를 입력해주세요</label>
+                            <input type="text" class="form-control" name="cpeople" id="cpeople">
+                        </div>
+                        <!-- <span>홈페이지 주소</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="chomepage" id="cchomepage">홈페이지 주소를 입력해주세요(http:// 제외)</label>
+                            <input type="text" class="form-control" name="chomepage" id="chomepage">
+                        </div>
+                        <!-- <span>회사 업종</span> -->
+                        <div class="selectbox">
+                            <!-- <label for="select">관심분야 선택</label>  -->
+                            <select id="form-select" name="tno" style="width:355px; height: 50px;">
+                                <option selected value="none">관심분야를 선택해주세요</option>
+                                <option class="dropdown-item" value=1>서비스업</option>
+                                <option class="dropdown-item" value=2>제조·화학</option>
+                                <option class="dropdown-item" value=3>IT·웹·통신</option>
+                                <option class="dropdown-item" value=4>은행·금융업</option>
+                                <option class="dropdown-item" value=5>미디어·디자인</option>
+                                <option class="dropdown-item" value=6>교육업</option>
+                                <option class="dropdown-item" value=7>의료·제약·복지</option>
+                                <option class="dropdown-item" value=8>판매·유통</option>
+                                <option class="dropdown-item" value=9>건설업</option>
+                                <option class="dropdown-item" value=10>기관·협회</option>
+                            </select>
+                        </div>
+                        <hr class="drivder">
+
+                        <div class="mb-4">
+                            <P>채용담당자 정보</P>
+                        </div>
+                        <!-- <span>아이디</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cid" id="id">아이디를 입력해주세요 (5~15자 입력)</label> <input
+                                type="text" class="form-control" name="cid" id="cid">
+                        </div>
+
+                        <!-- <span>비밀번호</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cpwd" id="pwdnew">비밀번호를 입력해주세요 (영문&숫자를 포함한
+                                8~20자)</label> <input type="password" class="form-control"
+                                                      name="cpwd" id="cpwd">
+                        </div>
+
+                        <!-- <span>비밀번호 확인</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cpwdconfrim" id="pwdText">비밀번호 확인</label> <input
+                                type="password" class="form-control" id="cpwdconfrim">
+                        </div>
+
+                        <!-- <span>담당자명</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cmanager" id="cmanagerTxt">담당자명을 입력해주세요</label> <input
+                                type="text" class="form-control" name="cmanager" id="cmanager">
+                        </div>
+
+                        <!-- <span>전화 번호</span> -->
+                        <div class="form-group last mb-4">
+                            <label for="cphone" id="phoneTxt">대표 번호를 입력해주세요 (번호만 입력)</label>
+                            <input type="text" class="form-control" name="cphone"
+                                   id="cphone">
+                        </div>
+
+                        <!-- <span>이메일 </span> -->
+                        <div class="form-group last mb-4 email_input">
+                            <label for="cemail" id="mailTxt">이메일을 입력해주세요</label> <input
+                                type="text" class="form-control" name="cemail" id="cemail">
+                        </div>
+
+                        <!-- <span>이메일 인증번호</span> -->
+                        <button class="btn btn-outline-primary" type="button" id="checkEmail">인증번호</button>
+
+                        <div class="form-group last mb-4 check_input">
+                            <label for="cemailconfirm" id="emailconfirmTxt">인증번호를 입력해주세요</label> <input
+                                type="text" class="form-control" id="cemailconfirm">
+                        </div>
+
+                        <br>
+                        <hr class="drivder">
+                        <div class="checkbox">
+                            <p> GoodJob 약관에 동의합니다 <input type="checkbox" name="chek" id="chek" /></p>
+                        </div>
+                        <br />
+                        <input type="submit" value="가입하기" class="btn btn-block btn-primary submit_btn" style="width: 356px;">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

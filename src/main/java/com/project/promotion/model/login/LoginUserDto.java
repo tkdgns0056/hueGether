@@ -1,5 +1,6 @@
-package com.project.promotion.model.member;
+package com.project.promotion.model.login;
 
+import com.project.promotion.model.member.Member;
 import lombok.Data;
 
 import javax.validation.constraints.Email;

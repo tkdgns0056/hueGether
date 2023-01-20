@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.promotion.mapper.RoomMapper">
+
+    <resultMap id="Business" type="Business">
+        <result column="business_id" property="businessId"/>
+    </resultMap>
+
+    <resultMap id="Room" type="Room">
+        <result column="business_id" property="businessId"/>
+        <result column="room_id" property="roomId"/>
+        <result column="room_price" property="roomPrice"/>
+        <result column="room_name" property="roomName"/>
+        <result column="room_info" property="roomInfo"/>
+        <result column="room_count" property="roomCount"/>
+        <collection property="business" resultMap="Business"/>
+    </resultMap>
+
+    <!-- 숙박업체 의 객실 리스트 가져오기 -->
+    <select id="getBusinessRoomList" resultType="Room" resultMap="Room" parameterType="Integer">
+        SELECT R.ROOM_ID, B.COMPANY_NAME, R.ROOM_NAME, R.ROOM_PRICE, R.ROOM_COUNT
+        FROM ROOM AS R
+         INNER JOIN BUSINESS AS B
+          ON B.BUSINESS_ID = R.BUSINESS_ID
+        WHERE B.BUSINESS_ID = #{businessId};
+    </select>
+</mapper>

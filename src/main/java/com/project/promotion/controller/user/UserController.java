@@ -1,14 +1,14 @@
-package com.project.promotion.controller;
+package com.project.promotion.controller.user;
 
-import com.project.promotion.model.member.LoginUserDto;
+import com.project.promotion.model.auth.PrincipalDetails;
 import com.project.promotion.model.member.Member;
 import com.project.promotion.model.member.UserDto;
-import com.project.promotion.service.auth.PrincipalDetailsService;
 import com.project.promotion.service.mail.MailService;
 import com.project.promotion.service.member.UserService;
 import com.project.promotion.validator.CheckMemberIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -68,12 +68,7 @@ public class UserController {
 
     /* 로그 아웃 */
     @PostMapping("/logout")
-    public String logout(HttpServletRequest request){
-        //세션 삭제 한다.
-        HttpSession session = request.getSession(false);
-        if(session != null){
-            session.invalidate();
-        }
+    public String logout(){
 
         return "redirect:/";
     }
